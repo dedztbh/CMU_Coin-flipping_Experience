@@ -2,7 +2,7 @@
 
 A Coin Flipping machine.
 
-Usage: java -jar xxx.jar <input file> <operator> <coin count (default 5)>
+Usage: java -jar xxx.jar \<input file> \<operator> \<coin count (default 5)>
 
 Available operators:
 Tester: Run a simulation and print results
