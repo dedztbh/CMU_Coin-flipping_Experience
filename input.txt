@@ -1,8 +1,5 @@
-GenFlip 0 0.1
 GenFlip 1 0.3
-GenFlip 2 0.5
 GenFlip 3 0.7
-GenFlip 4 0.9
 CNot 1 2
 CSwap 3 4 0
 CCNot 1 2 3

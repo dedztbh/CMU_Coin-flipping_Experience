@@ -1,7 +1,7 @@
 package operator
 
+import allStates
 import org.nd4j.linalg.api.ndarray.INDArray
-import kotlin.math.pow
 
 /**
  * Created by DEDZTBH on 2020/09/15.
@@ -47,8 +47,7 @@ class Prob0Init(N: Int) : ProbFinder(N) {
 
     override fun printResult() {
         val probs = eval(getZeroVec())
-        repeat(2.0.pow(N).toInt()) {
-            val endState = IntArray(N) { i -> (it shr i) and 1 }.apply { reverse() }
+        allStates(N).forEach { endState ->
             var prob = 1.0
             endState.forEach { i ->
                 prob *= if (i > 0) probs.getDouble(i) else (1.0 - probs.getDouble(i))
