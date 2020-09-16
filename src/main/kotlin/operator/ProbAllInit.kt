@@ -4,6 +4,7 @@ import allStates
 import org.nd4j.linalg.api.buffer.DataType
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
+import org.nd4j.linalg.string.NDArrayStrings
 
 /**
  * Created by DEDZTBH on 2020/09/15.
@@ -76,6 +77,6 @@ class ProbAllInit(N: Int) : ProbFinder(N) {
             // a 2^n by n matrix
             Nd4j.create(allStates(N)).castTo(DataType.DOUBLE)
         )
-        println(probs)
+        println(probs.toString(NDArrayStrings(Long.MAX_VALUE, 9)))
     }
 }

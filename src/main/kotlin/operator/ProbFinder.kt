@@ -7,11 +7,11 @@ import readDouble
 import readInt
 
 sealed class Operation
-data class Matrix(val opVec: INDArray, val opBias: INDArray): Operation()
-data class CNot(val i: Int, val j: Int): Operation()
-data class CSwap(val i: Int, val j: Int, val k: Int): Operation()
-data class CCNot(val i: Int, val j: Int, val k: Int): Operation()
-data class Gen1Bit(val i: Int, val p: Double, val q: Double): Operation()
+data class Matrix(val opVec: INDArray, val opBias: INDArray) : Operation()
+data class CNot(val i: Int, val j: Int) : Operation()
+data class CSwap(val i: Int, val j: Int, val k: Int) : Operation()
+data class CCNot(val i: Int, val j: Int, val k: Int) : Operation()
+data class Gen1Bit(val i: Int, val p: Double, val q: Double) : Operation()
 
 /**
  * Created by DEDZTBH on 2020/09/15.
