@@ -1,28 +1,26 @@
 package operator
 
-import org.nd4j.linalg.api.buffer.DataType
-import org.nd4j.linalg.api.ndarray.INDArray
-import org.nd4j.linalg.factory.Nd4j
-import readDouble
-import readInt
+import org.ejml.data.FMatrixRMaj
+import util.readFloat
+import util.readInt
 
 sealed class Operation
-data class Matrix(val opVec: INDArray, val opBias: INDArray) : Operation()
+data class MatrixOp(val opVec: FMatrixRMaj, val opBias: FMatrixRMaj) : Operation()
 data class CNot(val i: Int, val j: Int) : Operation()
 data class CSwap(val i: Int, val j: Int, val k: Int) : Operation()
 data class CCNot(val i: Int, val j: Int, val k: Int) : Operation()
-data class Gen1Bit(val i: Int, val p: Double, val q: Double) : Operation()
+data class Gen1Bit(val i: Int, val p: Float, val q: Float) : Operation()
 
 /**
  * Created by DEDZTBH on 2020/09/15.
  * Project CMU_Coin-flipping_Experience
  */
 abstract class ProbFinder(val N: Int) : Operator {
-    fun getOneVec(): INDArray = Nd4j.ones(1, N).castTo(DataType.DOUBLE)
-    fun getZeroVec(): INDArray = Nd4j.zeros(1, N).castTo(DataType.DOUBLE)
+    fun getOneVec(): FMatrixRMaj = FMatrixRMaj(arrayOf(FloatArray(N) { 1f }))
+    fun getZeroVec(): FMatrixRMaj = FMatrixRMaj(1, N)
     fun saveMatrix() {
         if (matrixDirty) {
-            operations.add(Matrix(opVec, opBias))
+            operations.add(MatrixOp(opVec, opBias))
             opVec = getOneVec()
             opBias = getZeroVec()
             matrixDirty = false
@@ -37,16 +35,15 @@ abstract class ProbFinder(val N: Int) : Operator {
 
     override fun runCmd(cmd: String): Int {
         val i = readInt()
-        val il = i.toLong()
         when (cmd) {
             "Flip" -> {
-                opVec.putScalar(il, 0.0)
-                opBias.putScalar(il, 0.5)
+                opVec[i] = 0f
+                opBias[i] = 0.5f
                 matrixDirty = true
             }
             "Not" -> {
-                opVec.putScalar(il, -opVec.getDouble(il))
-                opBias.putScalar(il, 1.0 - opBias.getDouble(il))
+                opVec[i] *= -1f
+                opBias[i] = 1f - opBias[i]
                 matrixDirty = true
             }
             "CNot" -> { // cannot represent in matrix op
@@ -67,14 +64,14 @@ abstract class ProbFinder(val N: Int) : Operator {
                 operations.add(CCNot(i, j, k))
             }
             "GenFlip" -> {
-                val j = readDouble()
-                opVec.putScalar(il, 0.0)
-                opBias.putScalar(il, j)
+                val j = readFloat()
+                opVec[i] = 0f
+                opBias[i] = j
                 matrixDirty = true
             }
             "Gen1Bit" -> { // cannot represent in matrix op
-                val p = readDouble()
-                val q = readDouble()
+                val p = readFloat()
+                val q = readFloat()
                 saveMatrix()
                 operations.add(Gen1Bit(i, p, q))
             }

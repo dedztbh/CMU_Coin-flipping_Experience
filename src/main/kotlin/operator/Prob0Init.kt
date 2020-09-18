@@ -1,43 +1,52 @@
 package operator
 
-import allStates
-import org.nd4j.linalg.api.ndarray.INDArray
+import org.ejml.data.FMatrixRMaj
+import org.ejml.dense.row.CommonOps_FDRM
+import org.ejml.kotlin.plusAssign
+import kotlin.math.pow
 
 /**
  * Created by DEDZTBH on 2020/09/15.
  * Project CMU_Coin-flipping_Experience
  */
+
+fun allStates(n: Int) =
+    Array(2.0.pow(n).toInt()) {
+        IntArray(n) { i -> (it shr i) and 1 }.apply { reverse() }
+    }
+
 class Prob0Init(N: Int) : ProbFinder(N) {
-    fun eval(probs: INDArray): INDArray {
+    fun eval(probs: FMatrixRMaj): FMatrixRMaj {
         operations.forEach {
             it.apply {
                 when (this) {
-                    is Matrix -> {
-                        probs.muli(opVec)
-                        probs.addi(opBias)
+                    is MatrixOp -> {
+                        CommonOps_FDRM.elementMult(probs, opVec)
+                        probs += opBias
                     }
                     is CNot -> {
-                        val x = probs.getDouble(i)
-                        val y = probs.getDouble(j)
-                        probs.putScalar(j.toLong(), (1.0 - x) * y + x * (1.0 - y))
+                        val x = probs[i]
+                        val y = probs[j]
+                        probs[j] = (1f - x) * y + x * (1f - y)
                     }
                     is CSwap -> {
-                        val x = probs.getDouble(i)
-                        val y = probs.getDouble(j)
-                        val z = probs.getDouble(k)
-                        probs.putScalar(j.toLong(), (1.0 - x) * y + x * z)
-                        probs.putScalar(k.toLong(), (1.0 - x) * z + x * y)
+                        val x = probs[i]
+                        val y = probs[j]
+                        val z = probs[k]
+                        val xFlip = 1f - x
+                        probs[j] = xFlip * y + x * z
+                        probs[k] = xFlip * z + x * y
                     }
                     is CCNot -> {
-                        val x = probs.getDouble(i)
-                        val y = probs.getDouble(j)
-                        val z = probs.getDouble(k)
-                        val probBoth0 = (1.0 - x) * (1.0 - y)
-                        probs.putScalar(k.toLong(), probBoth0 * z + (1.0 - probBoth0) * (1.0 - z))
+                        val x = probs[i]
+                        val y = probs[j]
+                        val z = probs[k]
+                        val probBoth0 = (1f - x) * (1f - y)
+                        probs[k] = probBoth0 * z + (1f - probBoth0) * (1f - z)
                     }
                     is Gen1Bit -> {
-                        val x = probs.getDouble(i)
-                        probs.putScalar(i.toLong(), x * (1.0 - q) * x + (1.0 - x) * (p + (1.0 - p) * x))
+                        val x = probs[i]
+                        probs[i] = x * (1f - q) * x + (1f - x) * (p + (1f - p) * x)
                     }
                 }
             }
@@ -48,11 +57,12 @@ class Prob0Init(N: Int) : ProbFinder(N) {
     override fun printResult() {
         val probs = eval(getZeroVec())
         allStates(N).forEach { endState ->
-            var prob = 1.0
+            var prob = 1f
             endState.forEach { i ->
-                prob *= if (i > 0) probs.getDouble(i) else (1.0 - probs.getDouble(i))
+                val x = probs[i]
+                prob *= if (i > 0) x else 1f - x
             }
-            println("Pr[%s] = %.9f".format(endState.joinToString(","), prob))
+            println("Pr[%s] = %.10f".format(endState.joinToString(","), prob))
         }
     }
 }

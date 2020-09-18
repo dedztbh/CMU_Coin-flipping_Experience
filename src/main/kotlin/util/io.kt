@@ -1,6 +1,7 @@
+package util
+
 import java.io.BufferedReader
 import java.util.*
-import kotlin.math.pow
 
 /**
  * Created by DEDZTBH on 2020/09/15.
@@ -16,11 +17,6 @@ fun read(): String {
 }
 
 fun readInt() = read().toInt()
-fun readDouble() = read().toDouble()
-
-fun allStates(n: Int) =
-    Array(2.0.pow(n).toInt()) {
-        IntArray(n) { i -> (it shr i) and 1 }.apply { reverse() }
-    }
+fun readFloat() = read().toFloat()
 
 lateinit var reader: BufferedReader

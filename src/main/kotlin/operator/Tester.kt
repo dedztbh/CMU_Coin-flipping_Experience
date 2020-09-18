@@ -1,7 +1,7 @@
 package operator
 
-import readDouble
-import readInt
+import util.readFloat
+import util.readInt
 import kotlin.random.Random
 
 /**
@@ -32,10 +32,10 @@ class Tester(N: Int) : Operator {
                 val k = readInt()
                 if (coins[i] or coins[j] != 0) coins flip k
             }
-            "GenFlip" -> coins[i] = if (Random.nextDouble() < readDouble()) 1 else 0
+            "GenFlip" -> coins[i] = if (Random.nextDouble() < readFloat()) 1 else 0
             "Gen1Bit" -> {
-                val p = readDouble()
-                val q = readDouble()
+                val p = readFloat()
+                val q = readFloat()
                 if (coins[i] == 0) {
                     if (Random.nextDouble() < p) coins[i] = 1
                 } else
