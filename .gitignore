@@ -149,5 +149,5 @@ CMU_Coin-flipping_Experience.iws
 CMU_Coin-flipping_Experience.main.iml
 CMU_Coin-flipping_Experience.test.iml
 gradle/
-gradlew
-gradlew.bat
+
+input.txt
