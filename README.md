@@ -9,7 +9,7 @@ A Coin Flipping machine inspired by the IBM Q Experience.
 java -jar xxx.jar \<input file> \<operator> \<coin count (default 5)>
 
 
-## Available operators:
+## Available Operators
 
 Tester: Run a simulation and print results
 
@@ -18,7 +18,7 @@ Prob0Init: Print the probabilities of each possible outcome (0 initialized)
 ProbAllInit: Print the probabilities of each coin being 1 for all initializations
 
 
-## Input commands:
+## Input Commands:
 
 ```
 $$ \begin{align*}  
