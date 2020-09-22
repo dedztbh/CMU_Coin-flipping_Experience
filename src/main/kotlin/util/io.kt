@@ -17,6 +17,6 @@ fun read(): String {
 }
 
 fun readInt() = read().toInt()
-fun readFloat() = read().toFloat()
+fun readDouble() = read().toDouble()
 
 lateinit var reader: BufferedReader

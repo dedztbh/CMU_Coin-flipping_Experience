@@ -1,7 +1,7 @@
 package operator
 
-import org.ejml.data.FMatrixRMaj
-import org.ejml.dense.row.CommonOps_FDRM
+import org.ejml.data.DMatrixRMaj
+import org.ejml.dense.row.CommonOps_DDRM
 import org.ejml.kotlin.minus
 import org.ejml.kotlin.plus
 import org.ejml.kotlin.plusAssign
@@ -9,19 +9,19 @@ import org.ejml.kotlin.times
 import util.*
 
 sealed class Operation
-data class MatrixOp(val opVec: FMatrixRMaj, val opBias: FMatrixRMaj) : Operation()
+data class MatrixOp(val opVec: DMatrixRMaj, val opBias: DMatrixRMaj) : Operation()
 data class CNot(val i: Int, val j: Int) : Operation()
 data class CSwap(val i: Int, val j: Int, val k: Int) : Operation()
 data class CCNot(val i: Int, val j: Int, val k: Int) : Operation()
-data class Gen1Bit(val i: Int, val p: Float, val q: Float) : Operation()
+data class Gen1Bit(val i: Int, val p: Double, val q: Double) : Operation()
 
 /**
  * Created by DEDZTBH on 2020/09/15.
  * Project CMU_Coin-flipping_Experience
  */
 abstract class ProbFinder(val N: Int) : Operator {
-    fun getOneVec(): FMatrixRMaj = FMatrixRMaj(arrayOf(FloatArray(N) { 1f }))
-    fun getZeroVec(): FMatrixRMaj = FMatrixRMaj(1, N)
+    fun getOneVec(): DMatrixRMaj = DMatrixRMaj(arrayOf(DoubleArray(N) { 1.0 }))
+    fun getZeroVec(): DMatrixRMaj = DMatrixRMaj(1, N)
     fun saveMatrix() {
         if (matrixDirty) {
             operations.add(MatrixOp(opVec, opBias))
@@ -41,13 +41,13 @@ abstract class ProbFinder(val N: Int) : Operator {
         val i = readInt()
         when (cmd) {
             "Flip" -> {
-                opVec[i] = 0f
-                opBias[i] = 0.5f
+                opVec[i] = 0.0
+                opBias[i] = 0.5
                 matrixDirty = true
             }
             "Not" -> {
-                opVec[i] *= -1f
-                opBias[i] = 1f - opBias[i]
+                opVec[i] *= -1.0
+                opBias[i] = 1.0 - opBias[i]
                 matrixDirty = true
             }
             "CNot" -> { // cannot represent in matrix op
@@ -68,14 +68,14 @@ abstract class ProbFinder(val N: Int) : Operator {
                 operations.add(CCNot(i, j, k))
             }
             "GenFlip" -> {
-                val j = readFloat()
-                opVec[i] = 0f
+                val j = readDouble()
+                opVec[i] = 0.0
                 opBias[i] = j
                 matrixDirty = true
             }
             "Gen1Bit" -> { // cannot represent in matrix op
-                val p = readFloat()
-                val q = readFloat()
+                val p = readDouble()
+                val q = readDouble()
                 saveMatrix()
                 operations.add(Gen1Bit(i, p, q))
             }
@@ -86,21 +86,21 @@ abstract class ProbFinder(val N: Int) : Operator {
 
     override fun done() = saveMatrix()
 
-    fun eval(probs: FMatrixRMaj): FMatrixRMaj = probs.apply {
+    fun eval(probs: DMatrixRMaj): DMatrixRMaj = probs.apply {
         val broadcastVec =
-            FMatrixRMaj(probs.numRows, 1, true, *FloatArray(probs.numRows) { 1f })
+            DMatrixRMaj(probs.numRows, 1, true, *DoubleArray(probs.numRows) { 1.0 })
         operations.forEach {
             it.apply {
                 when (this) {
                     is MatrixOp -> {
-                        CommonOps_FDRM.elementMult(probs, broadcastVec * opVec)
+                        CommonOps_DDRM.elementMult(probs, broadcastVec * opVec)
                         probs += broadcastVec * opBias
                     }
                     is CNot -> {
                         val x = probs getColumn i
                         val y = probs getColumn j
                         //(1 - x) * y + x * (1 - y)
-                        probs.putColumn(j, (-2f * x mul y) + x + y)
+                        probs.putColumn(j, (-2.0 * x mul y) + x + y)
                     }
                     is CSwap -> {
                         val x = probs getColumn i
@@ -118,17 +118,17 @@ abstract class ProbFinder(val N: Int) : Operator {
                         val y = probs getColumn j
                         val z = probs getColumn k
                         //(1 - x) * (1 - y)
-                        val probBoth0 = (x mul y) - x - y + 1f
+                        val probBoth0 = (x mul y) - x - y + 1.0
                         //probBoth0 * z + (1 - probBoth0) * (1 - z)
-                        probs.putColumn(k, (2f * probBoth0 mul z) - probBoth0 - z + 1f)
+                        probs.putColumn(k, (2.0 * probBoth0 mul z) - probBoth0 - z + 1.0)
                     }
                     is Gen1Bit -> {
                         val x = probs getColumn i
                         val xx = x mul x
-                        val pComp = 1f - p
+                        val pComp = 1.0 - p
                         //x * (1 - q) * x + (1 - x) * (p + (1 - p) * x)
                         //= xx(1-q) + p + (1-p)x - xp - xx(1-p)
-                        probs.putColumn(i, (xx * (1f - q)) + p + (x * pComp) - (x * p) - (xx * pComp))
+                        probs.putColumn(i, (xx * (1.0 - q)) + p + (x * pComp) - (x * p) - (xx * pComp))
                     }
                 }
             }

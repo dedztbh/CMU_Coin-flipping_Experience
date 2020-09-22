@@ -1,6 +1,6 @@
 package operator
 
-import org.ejml.data.FMatrixRMaj
+import org.ejml.data.DMatrixRMaj
 import kotlin.math.pow
 
 /**
@@ -8,16 +8,16 @@ import kotlin.math.pow
  * Project CMU_Coin-flipping_Experience
  */
 
-fun allStatesFloat(n: Int) =
+fun allStatesDouble(n: Int) =
     Array(2.0.pow(n).toInt()) {
-        FloatArray(n) { i -> ((it shr i) and 1).toFloat() }.apply { reverse() }
+        DoubleArray(n) { i -> ((it shr i) and 1).toDouble() }.apply { reverse() }
     }
 
 class ProbAllInit(N: Int) : ProbFinder(N) {
     override fun printResult() {
         eval(
             // a 2^n by n matrix
-            FMatrixRMaj(allStatesFloat(N))
+            DMatrixRMaj(allStatesDouble(N))
         ).print()
     }
 }

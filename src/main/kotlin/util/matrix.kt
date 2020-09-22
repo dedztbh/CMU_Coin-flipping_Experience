@@ -1,7 +1,8 @@
 package util
 
-import org.ejml.data.FMatrixRMaj
-import org.ejml.dense.row.CommonOps_FDRM
+import org.ejml.data.DMatrixRMaj
+import org.ejml.dense.row.CommonOps_DDRM
+import org.ejml.simple.ops.SimpleOperations_DDRM
 
 /**
  * Created by DEDZTBH on 2020/09/18.
@@ -11,20 +12,21 @@ import org.ejml.dense.row.CommonOps_FDRM
 /**
  * Retrieve column i
  */
-infix fun FMatrixRMaj.getColumn(i: Int) = CommonOps_FDRM.extractColumn(this, i, null)
+infix fun DMatrixRMaj.getColumn(i: Int) = CommonOps_DDRM.extractColumn(this, i, null)
 
 /**
  * Replace column i
  */
-fun FMatrixRMaj.putColumn(i: Int, col: FMatrixRMaj) = col.data.forEachIndexed { rowi, fl -> set(rowi, i, fl) }
+val simpleOps = SimpleOperations_DDRM()
+fun DMatrixRMaj.putColumn(i: Int, col: DMatrixRMaj) = simpleOps.setColumn(this, i, 0, *col.data)
 
 /**
  * Element-wise multiplication (pure)
  */
-infix fun FMatrixRMaj.mul(other: FMatrixRMaj) = createLike().also { CommonOps_FDRM.elementMult(this, other, it) }
+infix fun DMatrixRMaj.mul(other: DMatrixRMaj) = createLike().also { CommonOps_DDRM.elementMult(this, other, it) }
 
 /**
  * Scalar Multiplication (pure)
  */
-operator fun FMatrixRMaj.times(f: Float) = createLike().also { CommonOps_FDRM.scale(f, this, it) }
-operator fun Float.times(f: FMatrixRMaj) = f * this
+operator fun DMatrixRMaj.times(f: Double) = createLike().also { CommonOps_DDRM.scale(f, this, it) }
+operator fun Double.times(f: DMatrixRMaj) = f * this

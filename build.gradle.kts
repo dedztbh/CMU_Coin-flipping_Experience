@@ -6,7 +6,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 group = "com.dedztbh"
-version = "1.1"
+version = "1.2"
 
 val ejmlVersion = "0.39"
 
@@ -17,11 +17,16 @@ repositories {
 dependencies {
     implementation("org.ejml:ejml-core:${ejmlVersion}")
     implementation("org.ejml:ejml-kotlin:${ejmlVersion}")
-    implementation("org.ejml:ejml-fdense:${ejmlVersion}")
-//    testImplementation(kotlin("test-junit"))
+    implementation("org.ejml:ejml-ddense:${ejmlVersion}")
+    implementation("org.ejml:ejml-simple:${ejmlVersion}")
 }
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.freeCompilerArgs = listOf(
+        "-Xno-param-assertions",
+        "-Xno-call-assertions",
+        "-Xno-receiver-assertions"
+    )
 }
 
 tasks {
